@@ -67,7 +67,7 @@ export const Board: React.FC<BoardProps> = ({ teams, children, isFullscreen, onT
         onDragOver={(e) => e.preventDefault()}
         className="bg-slate-900 border-4 border-slate-700 rounded-3xl shadow-2xl relative overflow-hidden select-none bg-contain bg-no-repeat bg-center aspect-square h-[88vh] max-h-[88vh]"
         style={{
-          backgroundImage: `url('/meu_tabuleiro.svg')`,
+          backgroundImage: `url('${import.meta.env.BASE_URL}meu_tabuleiro.svg')`,
         }}
       >
         {/* Centro do Tabuleiro - Caixa de Dados Proporcional */}

@@ -61,111 +61,6 @@ export default defineConfig([
 
 ======================================================================
 
---- CAMINHO DO ARQUIVO: gerar_1000_perguntas.py ---
-Conteúdo:
-----------------------------------------
-import json
-import random
-
-categories = ['geometria', 'algebra', 'operacoes', 'xadrez', 'damas', 'graficos']
-levels = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-
-# Subtemas detalhados da BNCC para enriquecer os títulos e enunciados
-subtopics = {
-    'operacoes': ['Aritmética Básica', 'Frações e Decimais', 'Porcentagem', 'Expressões Numéricas', 'Conversão de Unidades'],
-    'algebra': ['Padrões e Sequências', 'Linguagem Algébrica', 'Valor Numérico', 'Equações do 1º Grau', 'Incógnitas e Sistemas'],
-    'geometria': ['Pontos, Retas e Ângulos', 'Polígonos e Triângulos', 'Perímetro e Área', 'Sólidos Geométricos e Poliedros', 'Volumes e Capacidades'],
-    'xadrez': ['Tática: Peça Pendurada', 'Xeque-Mate em 1 Lance', 'Aberturas e Princípios', 'Capturas e Trocas'],
-    'damas': ['Damas: Captura Obrigatória', 'Coroação da Dama', 'Estratégia de Avanço'],
-    'graficos': ['Estatística e Média', 'Leitura de Gráficos de Barras', 'Probabilidade Básica', 'Informações Cruzadas']
-}
-
-questions = []
-id_counter = 1
-
-for _ in range(1000):
-    lvl = random.choice(levels)
-    cat = random.choice(categories)
-    sub = random.choice(subtopics[cat])
-    
-    if cat == 'operacoes':
-        if sub == 'Porcentagem':
-            p = random.choice([10, 20, 25, 50, 75])
-            val = random.choice([40, 80, 100, 200, 400])
-            ans = (p * val) // 100
-            stmt = f"Quanto é {p}% de {val}?"
-            answer_str = f"{ans}"
-        elif sub == 'Frações':
-            den = random.choice([2, 4, 5, 8, 10])
-            num = random.randint(1, den - 1)
-            total = den * random.randint(2, 15)
-            ans = (total // den) * num
-            stmt = f"Quanto é {num}/{den} de {total}?"
-            answer_str = f"{ans}"
-        else:
-            a = random.randint(lvl * 3, lvl * 20)
-            b = random.randint(1, lvl * 8)
-            ans = a + b
-            stmt = f"Resolva a operação: {a} + {b} = ?"
-            answer_str = f"{ans}"
-            
-    elif cat == 'algebra':
-        x = random.randint(2, 12)
-        m = random.randint(2, 4)
-        c = random.randint(1, 15)
-        res = m * x + c
-        stmt = f"Encontre o valor de X na expressão: {m}X + {c} = {res}"
-        answer_str = f"X = {x}"
-        
-    elif cat == 'geometria':
-        if 'Área' in sub:
-            b_geom = random.randint(4, 15)
-            h_geom = random.randint(3, 10)
-            area = b_geom * h_geom
-            stmt = f"Qual é a área de um retângulo com base {b_geom} cm e altura {h_geom} cm?"
-            answer_str = f"{area} cm²"
-        else:
-            ang = random.choice([30, 45, 60, 90, 120])
-            comp = 180 - ang
-            stmt = f"Qual é o ângulo suplementar de {ang}°?"
-            answer_str = f"{comp}°"
-            
-    elif cat == 'xadrez':
-        stmt = "Em uma tática de xadrez, como chamamos uma peça adversária que está sem a defesa de outras peças?"
-        answer_str = "Peça pendurada"
-        
-    elif cat == 'damas':
-        stmt = "No jogo de damas, quando uma peça simples alcança a última fileira do tabuleiro, ela vira o quê?"
-        answer_str = "Dama"
-        
-    else:
-        vals = [random.randint(5, 25), random.randint(10, 35), random.randint(15, 45)]
-        med = sum(vals) // 3
-        stmt = f"Calcule a média aritmética dos valores: {vals[0]}, {vals[1]} e {vals[2]}."
-        answer_str = f"{med}"
-
-    q_obj = {
-        "id": f"q_{id_counter}",
-        "level": lvl,
-        "category": cat,
-        "title": sub,
-        "statement": stmt,
-        "answer": answer_str,
-        "explanation": f"Questão elaborada para o {lvl}º ano - Base Nacional Comum Curricular (BNCC).",
-        "timeLimit": 45,
-        "points": lvl * 25
-    }
-    
-    questions.append(q_obj)
-    id_counter += 1
-
-output_path = "src/data/questions.json"
-with open(output_path, 'w', encoding='utf-8') as f:
-    json.dump(questions, f, ensure_ascii=False, indent=2)
-
-print(f"Sucesso! {len(questions)} perguntas geradas com sucesso para todos os níveis e temas em {output_path}.")
-======================================================================
-
 --- CAMINHO DO ARQUIVO: gerar_auditoria.py ---
 Conteúdo:
 ----------------------------------------
@@ -482,14 +377,13 @@ Conteúdo:
 --- CAMINHO DO ARQUIVO: vite.config.ts ---
 Conteúdo:
 ----------------------------------------
-import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  base: '/mathopoly/', 
 })
-
 ======================================================================
 
 --- CAMINHO DO ARQUIVO: src\App.css ---
@@ -686,7 +580,7 @@ Conteúdo:
 Conteúdo:
 ----------------------------------------
 import React, { useState, useRef, useEffect } from 'react';
-import type { Team, TeamColor, Question, ChallengeCategory } from './types';
+import type { Team, TeamColor, Question } from './types';
 import { Board } from './components/Board/Board';
 import { ScoreBoard } from './components/Controls/ScoreBoard';
 import { DiceRoller } from './components/Controls/DiceRoller';
@@ -707,6 +601,10 @@ export const App: React.FC = () => {
   const [selectedLevel, setSelectedLevel] = useState<number>(5);
   const [lastDiceSum, setLastDiceSum] = useState<number | null>(null);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  
+  // Novos estados para gerenciamento de perguntas e Pensa Rápido
+  const [usedQuestions, setUsedQuestions] = useState<string[]>([]);
+  const [isPensaRapidoAtivo, setIsPensaRapidoAtivo] = useState(false);
   
   const appRef = useRef<HTMLDivElement>(null);
   const questions: Question[] = questionsData as Question[];
@@ -740,10 +638,70 @@ export const App: React.FC = () => {
     setLastDiceSum(total);
   };
 
-  const triggerCategoryChallenge = (category: ChallengeCategory) => {
-    const filtered = questions.filter((q) => q.level === selectedLevel && q.category === category);
-    const chosen = filtered.length > 0 ? filtered[Math.floor(Math.random() * filtered.length)] : questions[0];
+  const triggerCategoryChallenge = (category: string) => {
+    const available = questions.filter(
+      (q) =>
+        q.level === selectedLevel &&
+        q.category === category &&
+        !usedQuestions.includes(q.id)
+    );
+
+    if (available.length === 0) {
+      alert("As perguntas deste nível e categoria acabaram! O histórico será resetado.");
+      setUsedQuestions([]);
+      return;
+    }
+
+    const chosen = available[Math.floor(Math.random() * available.length)];
+    setUsedQuestions([...usedQuestions, chosen.id]);
+    setIsPensaRapidoAtivo(false);
     setActiveQuestion(chosen);
+  };
+
+  // Função para Desafios Especiais (Pensa Rápido e Desafio Geral)
+  const triggerSpecialChallenge = (type: 'pensa_rapido' | 'desafio_geral') => {
+    const levelToSearch = type === 'pensa_rapido' ? 1 : selectedLevel;
+    
+    const available = questions.filter(
+      (q) => q.level === levelToSearch && !usedQuestions.includes(q.id)
+    );
+    
+    if (available.length === 0) {
+      alert("Perguntas esgotadas. Resetando histórico...");
+      setUsedQuestions([]);
+      return;
+    }
+
+    const chosen = available[Math.floor(Math.random() * available.length)];
+    setUsedQuestions([...usedQuestions, chosen.id]);
+    setIsPensaRapidoAtivo(type === 'pensa_rapido');
+    setActiveQuestion(chosen);
+  };
+
+  // Mecânica de Sorte ou Revés interativa
+  const handleSorteReves = () => {
+    const isSorte = Math.random() > 0.5;
+    if (isSorte) {
+      alert("🍀 SORTE!\n\nAvance 2 casas ou ganhe 50 pontos extras!");
+    } else {
+      const defender = confirm(
+        "☠️ REVÉS!\n\nPerca 50 pontos ou tente um DESAFIO PARA SE DEFENDER!\nDeseja tentar a defesa resolvendo uma questão de 1 nível ACIMA?"
+      );
+      if (defender) {
+        const nextLevel = Math.min(selectedLevel + 1, 9);
+        const available = questions.filter(
+          (q) => q.level === nextLevel && !usedQuestions.includes(q.id)
+        );
+        if (available.length > 0) {
+          const chosen = available[Math.floor(Math.random() * available.length)];
+          setUsedQuestions([...usedQuestions, chosen.id]);
+          setIsPensaRapidoAtivo(false);
+          setActiveQuestion(chosen);
+        } else {
+          alert("Não há perguntas de nível superior disponíveis. Você escapou do revés!");
+        }
+      }
+    }
   };
 
   return (
@@ -798,48 +756,84 @@ export const App: React.FC = () => {
         {/* COLUNA DIREITA (lg:col-span-3) - Nível e Desafios nas Sobras */}
         <div className="lg:col-span-3 flex flex-col gap-3 max-h-[92vh] overflow-y-auto">
           
-          {/* Card de Identidade e Nível */}
-          <div className="bg-slate-900/90 border border-slate-800 p-3.5 rounded-2xl shadow-xl flex flex-col gap-3">
-            <div className="flex items-center gap-2.5 border-b border-slate-800 pb-2.5">
-              <span className="text-2xl">🎲</span>
-              <div>
-                <h1 className="text-base font-black text-amber-400 tracking-wider">
-                  MATHOPOLY
-                </h1>
-                <p className="text-[10px] text-slate-400">Ambiente Interativo</p>
-              </div>
+          {/* Card de Identidade e Nível / Pontuação */}
+<div className="bg-slate-900/90 border border-slate-800 p-3.5 rounded-2xl shadow-xl flex flex-col gap-3">
+  <div className="flex items-center gap-2.5 border-b border-slate-800 pb-2.5">
+    <span className="text-2xl">🎲</span>
+    <div>
+      <h1 className="text-base font-black text-amber-400 tracking-wider">
+        MATHOPOLY
+      </h1>
+      <p className="text-[10px] text-slate-400">Ambiente Interativo</p>
+    </div>
+  </div>
+
+  <div className="flex items-center justify-between bg-slate-800/80 px-3 py-2 rounded-xl border border-slate-700">
+    <label className="text-xs font-bold text-slate-300 uppercase">Dificuldade (Pontos):</label>
+    <select
+      value={selectedLevel}
+      onChange={(e) => setSelectedLevel(Number(e.target.value))}
+      className="bg-slate-900 text-amber-400 text-xs font-bold py-1 px-2 rounded-lg border border-slate-600 focus:outline-none cursor-pointer"
+    >
+      {[
+        { level: 1, pts: 25 },
+        { level: 2, pts: 50 },
+        { level: 3, pts: 75 },
+        { level: 4, pts: 100 },
+        { level: 5, pts: 125 },
+        { level: 6, pts: 150 },
+        { level: 7, pts: 200 },
+        { level: 8, pts: 250 },
+        { level: 9, pts: 300 },
+      ].map((item) => (
+        <option key={item.level} value={item.level}>
+          Perguntas de {item.pts} pts
+        </option>
+      ))}
+    </select>
+  </div>
+</div>
+
+          {/* Casas do Tabuleiro (Categorias) */}
+          <div className="bg-slate-900/90 border border-slate-800 p-3.5 rounded-2xl shadow-xl flex flex-col gap-2">
+            <h3 className="text-xs font-bold text-slate-400 uppercase text-center border-b border-slate-800 pb-2">
+              Casas do Tabuleiro
+            </h3>
+            
+            <div className="grid grid-cols-2 gap-2 mt-1">
+              <button onClick={() => triggerCategoryChallenge('operacoes')} className="py-2 bg-amber-950 hover:bg-amber-900 text-amber-100 text-[10px] font-bold rounded border border-amber-800/50">
+                ➕ Operações
+              </button>
+              <button onClick={() => triggerCategoryChallenge('fracoes')} className="py-2 bg-sky-900 hover:bg-sky-800 text-sky-100 text-[10px] font-bold rounded border border-sky-800/50">
+                🍕 Frações
+              </button>
+              <button onClick={() => triggerCategoryChallenge('geometria')} className="py-2 bg-red-900 hover:bg-red-800 text-red-100 text-[10px] font-bold rounded border border-red-800/50">
+                📐 Geometria
+              </button>
+              <button onClick={() => triggerCategoryChallenge('algebra')} className="py-2 bg-purple-900 hover:bg-purple-800 text-purple-100 text-[10px] font-bold rounded border border-purple-800/50">
+                🧮 Álgebra
+              </button>
             </div>
 
-            <div className="flex items-center justify-between bg-slate-800/80 px-3 py-2 rounded-xl border border-slate-700">
-              <label className="text-xs font-bold text-slate-300 uppercase">Nível (Ano):</label>
-              <select
-                value={selectedLevel}
-                onChange={(e) => setSelectedLevel(Number(e.target.value))}
-                className="bg-slate-900 text-amber-400 text-xs font-bold py-1 px-2 rounded-lg border border-slate-600 focus:outline-none cursor-pointer"
+            <div className="grid grid-cols-1 gap-2 mt-2">
+              <button 
+                onClick={() => triggerSpecialChallenge('pensa_rapido')} 
+                className="py-2.5 bg-yellow-600 hover:bg-yellow-500 text-slate-950 font-black rounded-lg text-xs uppercase tracking-wider cursor-pointer"
               >
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((lvl) => (
-                  <option key={lvl} value={lvl}>
-                    {lvl}º Ano
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Card de Desafios Rápidos */}
-          <div className="bg-slate-900/90 border border-slate-800 p-3.5 rounded-2xl shadow-xl">
-            <h3 className="text-xs font-bold text-slate-400 uppercase mb-2 text-center">Disparar Desafio:</h3>
-            <div className="grid grid-cols-1 gap-1.5">
-              {(['geometria', 'algebra', 'operacoes', 'xadrez', 'damas', 'graficos'] as ChallengeCategory[]).map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => triggerCategoryChallenge(cat)}
-                  className="py-2 px-3 bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-bold rounded-lg border border-slate-700 capitalize transition-colors text-left flex items-center justify-between cursor-pointer group"
-                >
-                  <span>{cat}</span>
-                  <span className="text-slate-500 group-hover:text-amber-400">⚡</span>
-                </button>
-              ))}
+                ⏱️ Pensa Rápido (Lvl 1)
+              </button>
+              <button 
+                onClick={() => handleSorteReves()} 
+                className="py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-lg text-xs uppercase tracking-wider cursor-pointer"
+              >
+                🃏 Sorte ou Revés
+              </button>
+              <button 
+                onClick={() => triggerSpecialChallenge('desafio_geral')} 
+                className="py-2.5 bg-rose-700 hover:bg-rose-600 text-white font-black rounded-lg text-xs uppercase tracking-wider shadow-rose-900/50 shadow-lg cursor-pointer"
+              >
+                ⚔️ Desafio Geral (Todos!)
+              </button>
             </div>
           </div>
 
@@ -851,6 +845,7 @@ export const App: React.FC = () => {
       {activeQuestion && (
         <ChallengeModal
           question={activeQuestion}
+          isPensaRapido={isPensaRapidoAtivo}
           onClose={(pts) => {
             if (pts > 0) {
               setTeams((p) => p.map((t) => (t.id === currentTurn ? { ...t, score: t.score + pts } : t)));
@@ -961,7 +956,7 @@ export const Board: React.FC<BoardProps> = ({ teams, children, isFullscreen, onT
         onDragOver={(e) => e.preventDefault()}
         className="bg-slate-900 border-4 border-slate-700 rounded-3xl shadow-2xl relative overflow-hidden select-none bg-contain bg-no-repeat bg-center aspect-square h-[88vh] max-h-[88vh]"
         style={{
-          backgroundImage: `url('/meu_tabuleiro.svg')`,
+          backgroundImage: `url('${import.meta.env.BASE_URL}meu_tabuleiro.svg')`,
         }}
       >
         {/* Centro do Tabuleiro - Caixa de Dados Proporcional */}
@@ -1000,7 +995,7 @@ export const Board: React.FC<BoardProps> = ({ teams, children, isFullscreen, onT
 --- CAMINHO DO ARQUIVO: src\components\Cards\ChallengeModal.tsx ---
 Conteúdo:
 ----------------------------------------
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import type { Question } from '../../types';
 import { ChessViewer } from './ChessViewer';
 import { GeometryViewer } from './GeometryViewer';
@@ -1008,18 +1003,52 @@ import { GeometryViewer } from './GeometryViewer';
 interface ChallengeModalProps {
   question: Question;
   onClose: (awardedPoints: number) => void;
+  isPensaRapido?: boolean;
 }
 
-export const ChallengeModal: React.FC<ChallengeModalProps> = ({ question, onClose }) => {
-  const [timeLeft, setTimeLeft] = useState<number>(question.timeLimit);
+export const ChallengeModal: React.FC<ChallengeModalProps> = ({ question, onClose, isPensaRapido }) => {
+  // Se for Pensa Rápido, o tempo é 15s, senão usa o tempo da questão
+  const initialTime = isPensaRapido ? 15 : question.timeLimit;
+  const [timeLeft, setTimeLeft] = useState<number>(initialTime);
   const [showAnswer, setShowAnswer] = useState<boolean>(false);
   const [timerActive, setTimerActive] = useState<boolean>(true);
+
+  // Instâncias de áudio
+  const tickSound = useRef(new Audio('https://www.myinstants.com/media/sounds/clock-ticking-sound-effect.mp3'));
+  const buzzerSound = useRef(new Audio('https://www.myinstants.com/media/sounds/wrong-answer-sound-effect.mp3'));
+
+  useEffect(() => {
+    tickSound.current.volume = 0.5;
+    buzzerSound.current.volume = 1.0;
+    
+    // Limpa os áudios ao desmontar o componente
+    return () => {
+      tickSound.current.pause();
+      buzzerSound.current.pause();
+    };
+  }, []);
 
   useEffect(() => {
     if (!timerActive || timeLeft <= 0) return;
 
     const timer = setInterval(() => {
-      setTimeLeft((prev) => prev - 1);
+      setTimeLeft((prev) => {
+        const newTime = prev - 1;
+        
+        // Toca o tic-tac nos últimos 10 segundos
+        if (newTime <= 10 && newTime > 0) {
+          tickSound.current.play().catch(() => {});
+        }
+        
+        // Quando zera
+        if (newTime <= 0) {
+          tickSound.current.pause();
+          buzzerSound.current.play().catch(() => {});
+          setShowAnswer(true); // Revela a resposta automaticamente
+          setTimerActive(false);
+        }
+        return newTime;
+      });
     }, 1000);
 
     return () => clearInterval(timer);
@@ -1028,14 +1057,22 @@ export const ChallengeModal: React.FC<ChallengeModalProps> = ({ question, onClos
   const handleRevealAnswer = () => {
     setShowAnswer(true);
     setTimerActive(false);
+    tickSound.current.pause();
   };
+
+  const isTimeOut = timeLeft <= 0;
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-slate-800 border-2 border-slate-600 w-full max-w-lg rounded-2xl p-6 shadow-2xl flex flex-col text-white relative">
+      <div className={`bg-slate-800 border-4 w-full max-w-lg rounded-2xl p-6 shadow-2xl flex flex-col text-white relative transition-colors ${isTimeOut ? 'border-red-600' : 'border-slate-600'}`}>
         
-        {/* Cabeçalho do Card */}
-        <div className="flex justify-between items-center border-b border-slate-700 pb-3 mb-4">
+        {isPensaRapido && (
+          <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-500 text-slate-900 font-black px-4 py-1 rounded-full animate-bounce">
+            ⚡ PENSA RÁPIDO!
+          </div>
+        )}
+
+        <div className="flex justify-between items-center border-b border-slate-700 pb-3 mb-4 mt-2">
           <div>
             <span className="text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 px-2 py-1 rounded border border-amber-500/30">
               {question.category}
@@ -1043,64 +1080,45 @@ export const ChallengeModal: React.FC<ChallengeModalProps> = ({ question, onClos
             <h2 className="text-xl font-bold mt-1">{question.title}</h2>
           </div>
 
-          {/* Temporizador */}
-          <div className={`px-3 py-1.5 rounded-lg font-mono font-bold text-lg border ${
-            timeLeft <= 10 ? 'bg-red-500/20 text-red-400 border-red-500/50 animate-pulse' : 'bg-slate-700 text-slate-200 border-slate-600'
+          <div className={`px-3 py-1.5 rounded-lg font-mono font-bold text-xl border ${
+            timeLeft <= 10 && !isTimeOut ? 'bg-red-500/20 text-red-400 border-red-500/50 animate-pulse' : 
+            isTimeOut ? 'bg-red-600 text-white border-red-800' : 'bg-slate-700 text-slate-200 border-slate-600'
           }`}>
-            ⏱️ {timeLeft}s
+            {isTimeOut ? 'ESGOTADO' : `⏱️ ${timeLeft}s`}
           </div>
         </div>
 
-        {/* Enunciado */}
-        <p className="text-sm text-slate-200 mb-4 leading-relaxed">
+        <p className="text-xl font-medium text-slate-100 mb-6 text-center leading-relaxed">
           {question.statement}
         </p>
 
-        {/* Renderizadores Visuais */}
-        {question.category === 'xadrez' && (
-          <ChessViewer fen={question.fen} />
-        )}
+        {question.category === 'xadrez' && <ChessViewer fen={question.fen} />}
+        {question.category === 'geometria' && <GeometryViewer svgType={question.svgType} svgParams={question.svgParams} />}
 
-        {question.category === 'geometria' && (
-          <GeometryViewer svgType={question.svgType} svgParams={question.svgParams} />
-        )}
-
-        {/* Gabarito / Resposta */}
         {showAnswer ? (
-          <div className="mt-4 p-4 bg-emerald-950/60 border border-emerald-500/50 rounded-xl text-emerald-200 animate-fadeIn">
+          <div className="mt-2 p-4 bg-emerald-950/60 border border-emerald-500/50 rounded-xl text-emerald-200">
             <h3 className="font-bold text-emerald-400 mb-1">Gabarito Oficial:</h3>
-            <p className="text-lg font-black text-white mb-2">{question.answer}</p>
+            <p className="text-2xl font-black text-white mb-2 text-center">{question.answer}</p>
             {question.explanation && (
-              <p className="text-xs text-emerald-300/80 border-t border-emerald-800/50 pt-2">
+              <p className="text-sm text-emerald-300/80 border-t border-emerald-800/50 pt-2 mt-2">
                 <strong>Explicação:</strong> {question.explanation}
               </p>
             )}
           </div>
         ) : (
-          <button
-            onClick={handleRevealAnswer}
-            className="mt-4 w-full py-2.5 bg-slate-700 hover:bg-slate-600 border border-slate-500 rounded-xl font-bold text-amber-400 transition-colors"
-          >
+          <button onClick={handleRevealAnswer} className="mt-4 w-full py-3 bg-slate-700 hover:bg-slate-600 border border-slate-500 rounded-xl font-bold text-amber-400 transition-colors text-lg">
             🔍 Revelar Gabarito
           </button>
         )}
 
-        {/* Botões de Ação Final */}
         <div className="grid grid-cols-2 gap-3 mt-6 pt-3 border-t border-slate-700">
-          <button
-            onClick={() => onClose(0)}
-            className="py-2.5 bg-rose-600/80 hover:bg-rose-600 text-white font-bold rounded-xl transition-colors"
-          >
-            ❌ Errou (+0 pts)
+          <button onClick={() => onClose(0)} className="py-3 bg-rose-600/80 hover:bg-rose-600 text-white font-bold rounded-xl text-lg">
+            ❌ Errou (+0)
           </button>
-          <button
-            onClick={() => onClose(question.points)}
-            className="py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-colors"
-          >
-            ✅ Acertou (+{question.points} pts)
+          <button onClick={() => onClose(question.points)} className="py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-lg">
+            ✅ Acertou (+{question.points})
           </button>
         </div>
-
       </div>
     </div>
   );
@@ -11556,13 +11574,14 @@ export type ChallengeCategory =
 
 export interface BaseQuestion {
   id: string;
-  level: number; // Ano de referência (ex: 4, 5, 6, 7, 8, 9)
-  category: ChallengeCategory;
+  level: number;
+  tags?: string[];
+  category: string;
   title: string;
   statement: string;
   answer: string;
   explanation?: string;
-  timeLimit: number; // Em segundos
+  timeLimit: number;
   points: number;
 }
 
