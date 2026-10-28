@@ -3,6 +3,10 @@ import type { Question } from '../../types';
 import { ChessViewer } from './ChessViewer';
 import { GeometryViewer } from './GeometryViewer';
 
+// 1. Imports obrigatórios para renderizar o LaTeX com KaTeX
+import 'katex/dist/katex.min.css';
+import Latex from 'react-latex-next';
+
 interface ChallengeModalProps {
   question: Question;
   onClose: (awardedPoints: number) => void;
@@ -91,9 +95,10 @@ export const ChallengeModal: React.FC<ChallengeModalProps> = ({ question, onClos
           </div>
         </div>
 
-        <p className="text-xl font-medium text-slate-100 mb-6 text-center leading-relaxed">
-          {question.statement}
-        </p>
+        {/* 2. Enunciado processando LaTeX */}
+        <div className="text-xl font-medium text-slate-100 mb-6 text-center leading-relaxed">
+          <Latex>{question.statement}</Latex>
+        </div>
 
         {question.category === 'xadrez' && <ChessViewer fen={question.fen} />}
         {question.category === 'geometria' && <GeometryViewer svgType={question.svgType} svgParams={question.svgParams} />}
@@ -101,11 +106,17 @@ export const ChallengeModal: React.FC<ChallengeModalProps> = ({ question, onClos
         {showAnswer ? (
           <div className="mt-2 p-4 bg-emerald-950/60 border border-emerald-500/50 rounded-xl text-emerald-200">
             <h3 className="font-bold text-emerald-400 mb-1">Gabarito Oficial:</h3>
-            <p className="text-2xl font-black text-white mb-2 text-center">{question.answer}</p>
+            
+            {/* 3. Gabarito processando LaTeX */}
+            <div className="text-2xl font-black text-white mb-2 text-center">
+              <Latex>{question.answer}</Latex>
+            </div>
+            
+            {/* 4. Explicação processando LaTeX */}
             {question.explanation && (
-              <p className="text-sm text-emerald-300/80 border-t border-emerald-800/50 pt-2 mt-2">
-                <strong>Explicação:</strong> {question.explanation}
-              </p>
+              <div className="text-sm text-emerald-300/80 border-t border-emerald-800/50 pt-2 mt-2">
+                <strong>Explicação:</strong> <Latex>{question.explanation}</Latex>
+              </div>
             )}
           </div>
         ) : (

@@ -606,6 +606,9 @@ export const App: React.FC = () => {
   const [usedQuestions, setUsedQuestions] = useState<string[]>([]);
   const [isPensaRapidoAtivo, setIsPensaRapidoAtivo] = useState(false);
   
+  // Estado para o seletor dinâmico de categoria da casa atual
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  
   const appRef = useRef<HTMLDivElement>(null);
   const questions: Question[] = questionsData as Question[];
 
@@ -757,65 +760,96 @@ export const App: React.FC = () => {
         <div className="lg:col-span-3 flex flex-col gap-3 max-h-[92vh] overflow-y-auto">
           
           {/* Card de Identidade e Nível / Pontuação */}
-<div className="bg-slate-900/90 border border-slate-800 p-3.5 rounded-2xl shadow-xl flex flex-col gap-3">
-  <div className="flex items-center gap-2.5 border-b border-slate-800 pb-2.5">
-    <span className="text-2xl">🎲</span>
-    <div>
-      <h1 className="text-base font-black text-amber-400 tracking-wider">
-        MATHOPOLY
-      </h1>
-      <p className="text-[10px] text-slate-400">Ambiente Interativo</p>
-    </div>
-  </div>
-
-  <div className="flex items-center justify-between bg-slate-800/80 px-3 py-2 rounded-xl border border-slate-700">
-    <label className="text-xs font-bold text-slate-300 uppercase">Dificuldade (Pontos):</label>
-    <select
-      value={selectedLevel}
-      onChange={(e) => setSelectedLevel(Number(e.target.value))}
-      className="bg-slate-900 text-amber-400 text-xs font-bold py-1 px-2 rounded-lg border border-slate-600 focus:outline-none cursor-pointer"
-    >
-      {[
-        { level: 1, pts: 25 },
-        { level: 2, pts: 50 },
-        { level: 3, pts: 75 },
-        { level: 4, pts: 100 },
-        { level: 5, pts: 125 },
-        { level: 6, pts: 150 },
-        { level: 7, pts: 200 },
-        { level: 8, pts: 250 },
-        { level: 9, pts: 300 },
-      ].map((item) => (
-        <option key={item.level} value={item.level}>
-          Perguntas de {item.pts} pts
-        </option>
-      ))}
-    </select>
-  </div>
-</div>
-
-          {/* Casas do Tabuleiro (Categorias) */}
-          <div className="bg-slate-900/90 border border-slate-800 p-3.5 rounded-2xl shadow-xl flex flex-col gap-2">
-            <h3 className="text-xs font-bold text-slate-400 uppercase text-center border-b border-slate-800 pb-2">
-              Casas do Tabuleiro
-            </h3>
-            
-            <div className="grid grid-cols-2 gap-2 mt-1">
-              <button onClick={() => triggerCategoryChallenge('operacoes')} className="py-2 bg-amber-950 hover:bg-amber-900 text-amber-100 text-[10px] font-bold rounded border border-amber-800/50">
-                ➕ Operações
-              </button>
-              <button onClick={() => triggerCategoryChallenge('fracoes')} className="py-2 bg-sky-900 hover:bg-sky-800 text-sky-100 text-[10px] font-bold rounded border border-sky-800/50">
-                🍕 Frações
-              </button>
-              <button onClick={() => triggerCategoryChallenge('geometria')} className="py-2 bg-red-900 hover:bg-red-800 text-red-100 text-[10px] font-bold rounded border border-red-800/50">
-                📐 Geometria
-              </button>
-              <button onClick={() => triggerCategoryChallenge('algebra')} className="py-2 bg-purple-900 hover:bg-purple-800 text-purple-100 text-[10px] font-bold rounded border border-purple-800/50">
-                🧮 Álgebra
-              </button>
+          <div className="bg-slate-900/90 border border-slate-800 p-3.5 rounded-2xl shadow-xl flex flex-col gap-3">
+            <div className="flex items-center gap-2.5 border-b border-slate-800 pb-2.5">
+              <span className="text-2xl">🎲</span>
+              <div>
+                <h1 className="text-base font-black text-amber-400 tracking-wider">
+                  MATHOPOLY
+                </h1>
+                <p className="text-[10px] text-slate-400">Ambiente Interativo</p>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-2 mt-2">
+            <div className="flex items-center justify-between bg-slate-800/80 px-3 py-2 rounded-xl border border-slate-700">
+              <label className="text-xs font-bold text-slate-300 uppercase">Dificuldade (Pontos):</label>
+              <select
+                value={selectedLevel}
+                onChange={(e) => setSelectedLevel(Number(e.target.value))}
+                className="bg-slate-900 text-amber-400 text-xs font-bold py-1 px-2 rounded-lg border border-slate-600 focus:outline-none cursor-pointer"
+              >
+                {[
+                  { level: 1, pts: 25 },
+                  { level: 2, pts: 50 },
+                  { level: 3, pts: 75 },
+                  { level: 4, pts: 100 },
+                  { level: 5, pts: 125 },
+                  { level: 6, pts: 150 },
+                  { level: 7, pts: 200 },
+                  { level: 8, pts: 250 },
+                  { level: 9, pts: 300 },
+                ].map((item) => (
+                  <option key={item.level} value={item.level}>
+                    Perguntas de {item.pts} pts
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Seletor de Categoria Baseado na Casa Atual */}
+          <div className="bg-slate-900/90 border border-slate-800 p-3.5 rounded-2xl shadow-xl flex flex-col gap-2">
+            <label htmlFor="casa-selector" className="text-xs font-bold text-slate-400 uppercase text-center border-b border-slate-800 pb-2">
+              Casa Atual / Categoria
+            </label>
+
+            <select
+              id="casa-selector"
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 text-white font-medium rounded-xl shadow-inner focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-xs"
+            >
+              <option value="" disabled>Selecione a categoria da casa...</option>
+              <option value="Números">🔢 Números</option>
+              <option value="Números Decimais">🔢 Números Decimais</option>
+              <option value="Operações">➕ Operações</option>
+              <option value="Frações">🍕 Frações</option>
+              <option value="Porcentagem">📊 Porcentagem</option>
+              <option value="Pontos, Retas e Ângulos">📐 Pontos, Retas e Ângulos</option>
+              <option value="Polígonos e Triângulos">📐 Polígonos e Triângulos</option>
+              <option value="Perímetros e Áreas">📏 Perímetros e Áreas</option>
+              <option value="Sólidos Geométricos">📦 Sólidos Geométricos</option>
+              <option value="Corpos Redondos">🥫 Corpos Redondos</option>
+              <option value="Volumes e Capacidade">🧊 Volumes e Capacidade</option>
+              <option value="Equações">⚖️ Equações</option>
+              <option value="Incógnitas">❓ Incógnitas</option>
+              <option value="Simplificação">📉 Simplificação</option>
+              <option value="Valor Numérico">🔢 Valor Numérico</option>
+              <option value="Linguagem Algébrica">🔤 Linguagem Algébrica</option>
+              <option value="Padrões e Sequências">🔄 Padrões e Sequências</option>
+              <option value="Medidas">⏱️ Medidas</option>
+              <option value="Grandezas">📏 Grandezas</option>
+              <option value="Raciocínio">🧠 Raciocínio</option>
+              <option value="Condicionais">🔀 Condicionais</option>
+              <option value="Estratégia">♟️ Estratégia</option>
+              <option value="Enigmas">🔍 Enigmas</option>
+            </select>
+
+            <button
+              onClick={() => triggerCategoryChallenge(selectedCategory)}
+              disabled={!selectedCategory}
+              className="w-full mt-1 px-6 py-2.5 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-800 disabled:text-slate-600 text-white font-bold rounded-xl shadow-lg transition-all text-center cursor-pointer flex items-center justify-center gap-2 text-xs"
+            >
+              🎯 Sortear Pergunta da Casa
+            </button>
+          </div>
+
+          {/* Botões de Ações Especiais (Pensa Rápido, Sorte/Revés, Desafio Geral) */}
+          <div className="bg-slate-900/90 border border-slate-800 p-3.5 rounded-2xl shadow-xl flex flex-col gap-2">
+            <h3 className="text-xs font-bold text-slate-400 uppercase text-center border-b border-slate-800 pb-2">
+              Dinâmicas e Desafios
+            </h3>
+            <div className="grid grid-cols-1 gap-2 mt-1">
               <button 
                 onClick={() => triggerSpecialChallenge('pensa_rapido')} 
                 className="py-2.5 bg-yellow-600 hover:bg-yellow-500 text-slate-950 font-black rounded-lg text-xs uppercase tracking-wider cursor-pointer"
@@ -1137,7 +1171,7 @@ interface ChessViewerProps {
 
 export const ChessViewer: React.FC<ChessViewerProps> = ({ fen }) => {
   return (
-    <div className="w-full max-w-[280px] sm:max-w-[320px] mx-auto my-2 rounded-lg overflow-hidden border-2 border-slate-600 shadow-md pointer-events-none">
+    <div className="w-full max-w-70 sm:max-w-[320px] mx-auto my-2 rounded-lg overflow-hidden border-2 border-slate-600 shadow-md pointer-events-none">
       <Chessboard
         options={{
           position: fen,
@@ -1368,46 +1402,50 @@ export const ScoreBoard: React.FC<ScoreBoardProps> = ({
 Conteúdo:
 ----------------------------------------
 [
-  { "id": 0, "title": "PARTIDA", "category": "start" },
-  { "id": 1, "title": "Aritmética Básica", "category": "aritmetica", "color": "bg-amber-950" },
-  { "id": 2, "title": "DESAFIO", "category": "desafio" },
-  { "id": 3, "title": "Aritmética Básica", "category": "aritmetica", "color": "bg-amber-950" },
-  { "id": 4, "title": "REUNIÃO DE PAIS", "category": "taxa" },
-  { "id": 5, "title": "EXPRESSO DO SABER", "category": "trem" },
-  { "id": 6, "title": "Frações", "category": "frações", "color": "bg-sky-400" },
-  { "id": 7, "title": "SORTE", "category": "sorte" },
-  { "id": 8, "title": "Porcentagem", "category": "porcentagem", "color": "bg-sky-400" },
-  { "id": 9, "title": "Números Decimais", "category": "decimais", "color": "bg-sky-400" },
-  { "id": 10, "title": "ESCOLA", "category": "escola" },
-  { "id": 11, "title": "Expressões e Padrões", "category": "algebra", "color": "bg-purple-700" },
-  { "id": 12, "title": "EXPRESSO DO SABER", "category": "trem" },
-  { "id": 13, "title": "Expressões e Padrões", "category": "algebra", "color": "bg-purple-700" },
-  { "id": 14, "title": "Expressões e Padrões", "category": "algebra", "color": "bg-purple-700" },
-  { "id": 15, "title": "EXPRESSO DO SABER", "category": "trem" },
-  { "id": 16, "title": "Equações", "category": "equacoes", "color": "bg-orange-600" },
-  { "id": 17, "title": "DESAFIO", "category": "desafio" },
-  { "id": 18, "title": "Equações", "category": "equacoes", "color": "bg-orange-600" },
-  { "id": 19, "title": "Equações", "category": "equacoes", "color": "bg-orange-600" },
-  { "id": 20, "title": "INTERVALO", "category": "intervalo" },
-  { "id": 21, "title": "Geometria Plana", "category": "geometria", "color": "bg-red-600" },
-  { "id": 22, "title": "SORTE", "category": "sorte" },
-  { "id": 23, "title": "Geometria Plana", "category": "geometria", "color": "bg-red-600" },
-  { "id": 24, "title": "Geometria Plana", "category": "geometria", "color": "bg-red-600" },
-  { "id": 25, "title": "EXPRESSO DO SABER", "category": "trem" },
-  { "id": 26, "title": "Geometria Espacial", "category": "geometria", "color": "bg-yellow-400" },
-  { "id": 27, "title": "Geometria Espacial", "category": "geometria", "color": "bg-yellow-400" },
-  { "id": 28, "title": "LIÇÃO DE CASA", "category": "taxa" },
-  { "id": 29, "title": "Geometria Espacial", "category": "geometria", "color": "bg-yellow-400" },
-  { "id": 30, "title": "VÁ PARA A ESCOLA!", "category": "va_escola" },
-  { "id": 31, "title": "Grandezas e Medidas", "category": "medidas", "color": "bg-emerald-700" },
-  { "id": 32, "title": "Grandezas e Medidas", "category": "medidas", "color": "bg-emerald-700" },
-  { "id": 33, "title": "DESAFIO", "category": "desafio" },
-  { "id": 34, "title": "Grandezas e Medidas", "category": "medidas", "color": "bg-emerald-700" },
-  { "id": 35, "title": "EXPRESSO DO SABER", "category": "trem" },
-  { "id": 36, "title": "SORTE", "category": "sorte" },
-  { "id": 37, "title": "Raciocínio Lógico", "category": "logica", "color": "bg-blue-900" },
-  { "id": 38, "title": "TAXA DO SABER", "category": "taxa" },
-  { "id": 39, "title": "Raciocínio Lógico", "category": "logica", "color": "bg-blue-900" }
+  { "id": 0, "title": "PARTIDA", "category": "partida", "color": "bg-amber-800" },
+  { "id": 1, "title": "NÚMEROS", "category": "numeros", "color": "bg-amber-950" },
+  { "id": 2, "title": "DIRETORIA", "category": "diretoria", "color": "bg-amber-900" },
+  { "id": 3, "title": "OPERAÇÕES", "category": "operacoes", "color": "bg-amber-950" },
+  { "id": 4, "title": "REUNIÃO DE PAIS", "category": "reuniao_pais", "color": "bg-amber-950" },
+  { "id": 5, "title": "PENSA RÁPIDO", "category": "pensa_rapido", "color": "bg-cyan-200" },
+  { "id": 6, "title": "FRAÇÕES", "category": "fracoes", "color": "bg-cyan-400" },
+  { "id": 7, "title": "SORTE / REVÉS", "category": "sorte", "color": "bg-cyan-300" },
+  { "id": 8, "title": "PORCENTAGEM", "category": "porcentagem", "color": "bg-cyan-400" },
+  { "id": 9, "title": "DESAFIO GERAL", "category": "desafio_geral", "color": "bg-cyan-100" },
+  { "id": 10, "title": "NÚMEROS DECIMAIS", "category": "numeros_decimais", "color": "bg-cyan-500" },
+  { "id": 11, "title": "ESCOLA", "category": "escola", "color": "bg-amber-100" },
+  { "id": 12, "title": "PADRÕES E SEQUÊNCIAS", "category": "padroes_sequencias", "color": "bg-purple-700" },
+  { "id": 13, "title": "PENSA RÁPIDO", "category": "pensa_rapido", "color": "bg-purple-500" },
+  { "id": 14, "title": "LINGUAGEM ALGÉBRICA", "category": "linguagem_algebrica", "color": "bg-purple-800" },
+  { "id": 15, "title": "VALOR NUMÉRICO", "category": "valor_numerico", "color": "bg-purple-900" },
+  { "id": 16, "title": "DESAFIO GERAL", "category": "desafio_geral", "color": "bg-purple-400" },
+  { "id": 17, "title": "SIMPLIFICAÇÃO", "category": "simplificacao", "color": "bg-purple-600" },
+  { "id": 18, "title": "SORTE / REVÉS", "category": "sorte", "color": "bg-purple-400" },
+  { "id": 19, "title": "INCÓGNITAS", "category": "incognitas", "color": "bg-orange-600" },
+  { "id": 20, "title": "VAI PARA DIRETORIA", "category": "vai_diretoria", "color": "bg-orange-500" },
+  { "id": 21, "title": "EQUAÇÕES", "category": "equacoes", "color": "bg-orange-700" },
+  { "id": 22, "title": "PONTOS, RETAS E ÂNGULOS", "category": "pontos_retas_angulos", "color": "bg-red-700" },
+  { "id": 23, "title": "SORTE / REVÉS", "category": "sorte", "color": "bg-red-400" },
+  { "id": 24, "title": "POLÍGONOS E TRIÂNGULOS", "category": "poligonos_triangulos", "color": "bg-red-600" },
+  { "id": 25, "title": "PERÍMETROS E ÁREAS", "category": "perimetros_areas", "color": "bg-red-800" },
+  { "id": 26, "title": "DESAFIO GERAL", "category": "desafio_geral", "color": "bg-red-300" },
+  { "id": 27, "title": "VAI PARA DIRETORIA", "category": "vai_diretoria", "color": "bg-yellow-600" },
+  { "id": 28, "title": "SÓLIDOS GEOMÉTRICOS", "category": "solidos_geometricos", "color": "bg-yellow-500" },
+  { "id": 29, "title": "CORPOS REDONDOS", "category": "corpos_redondos", "color": "bg-yellow-400" },
+  { "id": 30, "title": "PENSA RÁPIDO", "category": "pensa_rapido", "color": "bg-yellow-300" },
+  { "id": 31, "title": "VOLUMES E CAPACIDADE", "category": "volumes_capacidade", "color": "bg-yellow-600" },
+  { "id": 32, "title": "ENIGMAS", "category": "enigmas", "color": "bg-emerald-600" },
+  { "id": 33, "title": "DIRETORIA", "category": "diretoria", "color": "bg-emerald-800" },
+  { "id": 34, "title": "VAI PARA DIRETORIA", "category": "vai_diretoria", "color": "bg-emerald-700" },
+  { "id": 35, "title": "RACIOCÍNIO", "category": "raciocinio", "color": "bg-emerald-900" },
+  { "id": 36, "title": "CONDICIONAIS", "category": "condicionais", "color": "bg-emerald-700" },
+  { "id": 37, "title": "DESAFIO GERAL", "category": "desafio_geral", "color": "bg-emerald-500" },
+  { "id": 38, "title": "ESTRATÉGIA", "category": "estrategia", "color": "bg-emerald-800" },
+  { "id": 39, "title": "PENSA RÁPIDO", "category": "pensa_rapido", "color": "bg-emerald-400" },
+  { "id": 40, "title": "RÁPIDO", "category": "rapido", "color": "bg-blue-400" },
+  { "id": 41, "title": "MEDIDAS", "category": "medidas", "color": "bg-blue-700" },
+  { "id": 42, "title": "SORTE / REVÉS", "category": "sorte", "color": "bg-blue-400" },
+  { "id": 43, "title": "GRANDEZAS", "category": "grandezas", "color": "bg-blue-900" }
 ]
 ======================================================================
 
